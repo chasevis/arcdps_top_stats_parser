@@ -40,13 +40,14 @@ if __name__ == '__main__':
 	parser.add_argument('-l', '--log_file', dest="log_file", help="Logging file with all the output")
 	parser.add_argument('-c', '--config_file', dest="config_file", help="Config file with all the settings", default="TW5_parser_config_detailed")
 	parser.add_argument('-a', '--anonymized', dest="anonymize", help="Create an anonymized version of the top stats. All account and character names will be replaced.", default=False, action='store_true')
+	parser.add_argument('-n', '--name', dest="tld_name", help="Name of the Tiddler", )
 	args = parser.parse_args()
 
 	if not os.path.isdir(args.input_directory):
 		print("Directory ",args.input_directory," is not a directory or does not exist!")
 		sys.exit()
 	if args.output_filename is None:
-		args.output_filename = args.input_directory+"/TW5_top_stats_detailed.tid"
+		args.output_filename = args.input_directory + "/output"+"/TW5_top_stats_detailed.tid"
 	if args.xls_output_filename is None:
 		args.xls_output_filename = args.input_directory+"/TW5_top_stats_detailed.xls"
 	if args.json_output_filename is None:
@@ -54,6 +55,7 @@ if __name__ == '__main__':
 	if args.log_file is None:
 		args.log_file = args.input_directory+"/log_detailed.txt"
 
+	os.makedirs(os.path.dirname(args.output_filename), exist_ok=True)
 	output = open(args.output_filename, "w",encoding="utf-8")
 	log = open(args.log_file, "w")
 
@@ -81,12 +83,17 @@ if __name__ == '__main__':
 	#Create Tid file header to support drag and drop onto html page
 	myDate = datetime.datetime.now()
 
+	args.input_directory = args.input_directory + "/output"
+	
+	if args.tld_name is None:
+		args.tld_name = myDate.strftime("%Y%m%d")+'-WvW-Log-Review'
+
 	myprint(output, 'created: '+myDate.strftime("%Y%m%d%H%M%S"))
 	myprint(output, 'modified: '+myDate.strftime("%Y%m%d%H%M%S"))
 	myprint(output, 'creator: '+config.summary_creator)
-	myprint(output, 'caption: '+myDate.strftime("%Y%m%d")+'-WvW-Log-Review')
+	myprint(output, 'caption: '+args.tld_name)
 	myprint(output, 'tags: Logs [['+myDate.strftime("%Y")+'-'+myDate.strftime("%m")+' Log Reviews]]')
-	myprint(output, 'title: '+myDate.strftime("%Y%m%d")+'-WvW-Log-Review\n')
+	myprint(output, 'title: '+args.tld_name+'\n')
 	#End Tid file header
 
 	
